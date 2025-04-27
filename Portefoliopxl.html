@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PortefolioPxL</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background-color: #0a0a0a;
+      color: #bbb;
+      font-family: 'Arial', sans-serif;
+      line-height: 1.6;
+      scroll-behavior: smooth;
+    }
+    
+    /* Barre de navigation */
+    nav {
+      background-color: #111;
+      padding: 15px 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      width: 100%;
+    }
+    nav ul {
+      list-style-type: none;
+      text-align: center;
+    }
+    nav ul li {
+      display: inline-block;
+      margin: 0 15px;
+    }
+    nav ul li a {
+      color: #bbb;
+      text-decoration: none;
+      font-size: 1.2em;
+      font-weight: bold;
+      padding: 8px 20px;
+      border-radius: 30px;
+      transition: background 0.3s, color 0.3s;
+    }
+    nav ul li a:hover {
+      background-color: #2575fc;
+      color: #fff;
+    }
+
+    /* Le reste du code reste inchangé */
+    header.hero {
+      height: 100vh;
+      background: url('https://img.freepik.com/vecteurs-libre/fond-noir-brillant-realiste_23-2150069283.jpg?semt=ais_hybrid&w=740') no-repeat center center/cover;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #fff;
+    }
+
+    header.hero::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 0;
+    }
+
+    header.hero h1, header.hero p, header.hero a {
+      position: relative;
+      z-index: 1;
+    }
+
+    header.hero h1 {
+      font-size: 10em;
+      letter-spacing: 2px;
+      margin-bottom: 0.3em;
+    }
+
+    header.hero p {
+      font-size: 1.4em;
+      margin-bottom: 1em;
+      color: #ccc;
+    }
+
+    .btn {
+      padding: 12px 30px;
+      background: linear-gradient(90deg, #6a11cb, #2575fc);
+      color: white;
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: bold;
+      transition: transform 0.3s, background 0.3s;
+    }
+    .btn:hover {
+      transform: scale(1.05);
+      background: linear-gradient(90deg, #2575fc, #6a11cb);
+    }
+
+    section {
+      padding: 80px 20px;
+      text-align: center;
+    }
+
+    section h2 {
+      font-size: 2.5em;
+      color: #eee;
+      margin-bottom: 20px;
+    }
+
+    section p {
+      max-width: 700px;
+      margin: 0 auto;
+      font-size: 1.1em;
+      color: #aaa;
+    }
+
+    .gallery-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .gallery-buttons a {
+      padding: 20px 40px;
+      background: linear-gradient(90deg, #6a11cb, #2575fc);
+      border-radius: 15px;
+      color: #fff;
+      font-weight: bold;
+      text-decoration: none;
+      font-size: 1.2em;
+      transition: transform 0.3s, background 0.3s;
+    }
+
+    .gallery-buttons a:hover {
+      transform: scale(1.05);
+      background: linear-gradient(90deg, #2575fc, #6a11cb);
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    form input, form textarea {
+      padding: 15px;
+      border: none;
+      border-radius: 8px;
+      background: #1a1a1a;
+      color: #eee;
+      font-size: 1em;
+    }
+
+    form button {
+      padding: 15px;
+      background: linear-gradient(90deg, #6a11cb, #2575fc);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: transform 0.3s, background 0.3s;
+    }
+
+    form button:hover {
+      transform: scale(1.05);
+      background: linear-gradient(90deg, #2575fc, #6a11cb);
+    }
+
+    footer.footer {
+      padding: 30px 20px;
+      text-align: center;
+      font-size: 0.9em;
+      background: #111;
+      margin-top: 60px;
+    }
+
+    .instagram-btn {
+      display: inline-flex;
+      align-items: center;
+      margin-top: 15px;
+      padding: 12px 25px;
+      background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+      color: white;
+      text-decoration: none;
+      border-radius: 30px;
+      font-weight: bold;
+      font-size: 1em;
+      transition: transform 0.3s;
+    }
+
+    .instagram-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .instagram-btn .icon {
+      width: 22px;
+      height: 22px;
+      margin-right: 10px;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Barre de navigation -->
+  <nav>
+    <ul>
+      <li><a href="#hero">Accueil</a></li>
+      <li><a href="#about">À propos</a></li>
+      <li><a href="#galeries">Galeries</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- Header -->
+  <header class="hero" id="hero">
+    <h1>PxL</h1>
+    <p>Le portfolio</p>
+    <a href="#galeries" class="btn">Découvrir mon univers</a>
+  </header>
+
+  <!-- Galeries -->
+  <section id="galeries">
+    <h2>Mes Galeries</h2>
+    <div class="gallery-buttons">
+      <a href="galerie1.html">Galerie 1</a>
+      <a href="galerie2.html">Galerie 2</a>
+      <a href="galerie3.html">Galerie 3</a>
+      <a href="galerie4.html">Galerie 4</a>
+      <a href="galerie5.html">Galerie 5</a>
+    </div>
+  </section>
+
+  <!-- À propos -->
+  <section id="about">
+    <h2>À propos</h2>
+    <p>Passionné par l'image et le détail, je capture des instants uniques à travers mon objectif. Basé sur l'émotion, la lumière et l'authenticité, mon travail explore les nuances du réel pour en révéler toute la beauté. Bienvenue dans mon univers — bienvenue chez PortefolioPxL.</p>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact">
+    <h2>Contact</h2>
+    <form action="#" method="post">
+      <input type="text" name="name" placeholder="Nom" required>
+      <input type="email" name="email" placeholder="Email" required>
+      <textarea name="message" placeholder="Votre message" required></textarea>
+      <button type="submit">Envoyer</button>
+    </form>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>© 2025 PortefolioPxL – Tous droits réservés.</p>
+    <a href="https://instagram.com/shootbypxl" target="_blank" class="instagram-btn" aria-label="Lien vers Instagram">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" class="icon">
+      Mon Instagram
+    </a>
+  </footer>
+
+</body>
+</html>

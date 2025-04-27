@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Galerie 5 - PortefolioPxL</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background-color: #0a0a0a;
+      color: #bbb;
+      font-family: 'Arial', sans-serif;
+      line-height: 1.6;
+    }
+    header {
+      text-align: center;
+      padding: 50px 20px;
+      background: #111;
+      color: #fff;
+    }
+    header h1 {
+      font-size: 3em;
+      letter-spacing: 3px;
+    }
+    section {
+      padding: 60px 20px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 40px;
+    }
+    .grid img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      opacity: 0;
+      transform: scale(0.95);
+      transition: transform 0.3s, opacity 0.6s ease-in-out;
+    }
+    .grid img.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .grid img:hover {
+      transform: scale(1.05);
+      opacity: 1;
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: #111;
+      color: #ccc;
+      font-size: 1em;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <h1>Galerie 5 - Mon Univers</h1>
+  </header>
+
+  <!-- Galerie -->
+  <section>
+    <div class="grid">
+      <img src="images/photo41.jpg" alt="Photo 41" class="fade-in">
+      <img src="images/photo42.jpg" alt="Photo 42" class="fade-in">
+      <img src="images/photo43.jpg" alt="Photo 43" class="fade-in">
+      <img src="images/photo44.jpg" alt="Photo 44" class="fade-in">
+      <img src="images/photo45.jpg" alt="Photo 45" class="fade-in">
+      <img src="images/photo46.jpg" alt="Photo 46" class="fade-in">
+      <img src="images/photo47.jpg" alt="Photo 47" class="fade-in">
+      <img src="images/photo48.jpg" alt="Photo 48" class="fade-in">
+      <img src="images/photo49.jpg" alt="Photo 49" class="fade-in">
+      <img src="images/photo50.jpg" alt="Photo 50" class="fade-in">
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 PortefolioPxL - Galerie 5</p>
+  </footer>
+
+  <script>
+    window.addEventListener('load', function() {
+      const images = document.querySelectorAll('.fade-in');
+      images.forEach((img, index) => {
+        setTimeout(() => {
+          img.classList.add('show');
+        }, index * 200);
+      });
+    });
+  </script>
+
+</body>
+</html>
