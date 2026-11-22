@@ -37,8 +37,10 @@ Langue : auto-détectée ; passe `--lang fr` si la vidéo est en français.
 - Modèle par défaut **medium** (bien meilleur sur les noms propres, sigles, écoles, marques) + une passe
   rapide **small** qui ne sert qu'à repérer les « euh » et faux départs que medium « avale » dans les
   mots voisins (ils sont dans `words.json` → `fillers`, et coupés automatiquement).
-- Vidéo iPhone/Android **HDR** (HLG/PQ) : convertie automatiquement en SDR par `cut.py` (sinon l'image
-  sort grise et délavée).
+- **Couleurs : on n'y touche jamais.** Pas d'étalonnage (`"grade": {"enabled": false}`). Une vidéo
+  iPhone/Android **HDR** (HLG / Dolby Vision / PQ) reste en HDR (`"hdr": "keep"` : HEVC 10 bits, mêmes
+  primaires et courbe que la source) et HyperFrames rend alors en HDR. `"hdr": "sdr"` seulement si on
+  demande explicitement une version SDR.
 - Compte ~2 min de calcul par minute de vidéo pour la transcription et ~2 min par minute pour la coupe.
 
 **Vidéo dans Dropbox** (trop lourde pour le chat) : `search` (catégorie vidéo) → `download_link` →

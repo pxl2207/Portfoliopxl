@@ -46,8 +46,9 @@
   des sous-titres.
 
 ## 7. Couleur & son
-- Étalonnage chaud et doux : contraste +6 %, saturation +7 %, légère chaleur, vignette légère,
-  un peu de netteté. Pas de LUT agressive.
+- **Ne jamais changer les couleurs de mes vidéos.** Aucun étalonnage, aucune LUT, aucune vignette.
+  Une vidéo HDR (iPhone : HLG / Dolby Vision) reste en HDR, telle qu'elle a été filmée
+  (`style.json` → `"grade": {"enabled": false}`, `"hdr": "keep"`).
 - Voix : nettoyée, compressée, **-14 LUFS**. Effets à ~0,4 de volume, jamais plus fort que la voix.
 - Palette de sons : whoosh (punch), impact basse (carte chiffre), pop (carte), clic doux
   (rare, sur un mot clé). On fait varier les prises (pitch) pour ne jamais répéter le même son.

@@ -32,7 +32,7 @@ def main():
     fade = 0.012
 
     grade = []
-    if g:
+    if g and g.get("enabled", True):
         grade.append("eq=contrast={c}:saturation={s}:brightness={b}:gamma={gm}".format(
             c=g.get("contrast", 1.0), s=g.get("saturation", 1.0), b=g.get("brightness", 0.0),
             gm=g.get("gamma", 1.0)))
@@ -48,11 +48,15 @@ def main():
     pr = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
                          "stream=color_transfer", "-of", "csv=p=0", a.video], capture_output=True, text=True)
     trc = pr.stdout.strip()
-    if trc in ("arib-std-b67", "smpte2084"):
+    hdr = trc in ("arib-std-b67", "smpte2084")
+    keep_hdr = hdr and st.get("hdr", "keep") == "keep"
+    if hdr and not keep_hdr:
         tone = [f"zscale=tin={trc}:min=bt2020nc:pin=bt2020:rin=tv:t=linear:npl=203", "format=gbrpf32le",
                 "zscale=p=bt709", "tonemap=hable:desat=2", "zscale=t=bt709:m=bt709:r=tv", "format=yuv420p",
                 "eq=saturation=0.82:gamma=1.08"]
         print(f"[cut] source HDR ({trc}) -> conversion SDR", file=sys.stderr)
+    elif keep_hdr:
+        print(f"[cut] source HDR ({trc}) conservée telle quelle (couleurs d'origine)", file=sys.stderr)
 
     # Une seule passe : on sélectionne les segments gardés (pas de split = mémoire constante)
     expr = "+".join(f"between(t,{s:.3f},{e:.3f})" for s, e in segs)
@@ -72,10 +76,17 @@ def main():
     script = a.out + ".filter.txt"
     open(script, "w").write(fc)
     cmd = ["ffmpeg", "-v", "error", "-y", "-i", a.video, "-filter_complex_script", script,
-           "-map", "[vc]", "-map", "[ao]", "-c:v", "libx264", "-preset", "medium", "-crf", "17",
-           "-pix_fmt", "yuv420p", "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709",
-           "-color_range", "tv", "-g", str(FPS // 2), "-keyint_min", str(FPS // 2), "-sc_threshold", "0",
-           "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", a.out]
+           "-map", "[vc]", "-map", "[ao]"]
+    if keep_hdr:  # HEVC 10 bits, mêmes primaires / courbe que la source : couleurs identiques
+        cmd += ["-c:v", "libx265", "-preset", "fast", "-crf", "16", "-pix_fmt", "yuv420p10le", "-tag:v", "hvc1",
+                "-color_primaries", "bt2020", "-color_trc", trc, "-colorspace", "bt2020nc", "-color_range", "tv",
+                "-x265-params", f"log-level=error:keyint={FPS // 2}:min-keyint={FPS // 2}:scenecut=0:"
+                f"colorprim=bt2020:transfer={trc}:colormatrix=bt2020nc:range=limited"]
+    else:
+        cmd += ["-c:v", "libx264", "-preset", "medium", "-crf", "17", "-pix_fmt", "yuv420p",
+                "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709", "-color_range", "tv",
+                "-g", str(FPS // 2), "-keyint_min", str(FPS // 2), "-sc_threshold", "0"]
+    cmd += ["-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", a.out]
     subprocess.run(cmd, check=True)
     print(f"[cut] {n} segments -> {a.out} ({cuts['duration_out']:.1f}s)", file=sys.stderr)
 
