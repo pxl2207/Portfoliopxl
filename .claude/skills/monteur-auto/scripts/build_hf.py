@@ -50,7 +50,7 @@ def font_faces(prefix="assets/fonts/"):
 
 def captions_html(plan, st, W, H, D):
     C, col = st["captions"], st["colors"]
-    bottom = H - C["y_bottom"]
+    bottom = H - plan.get("layout", {}).get("cap_bottom", C["y_bottom"])
     groups = []
     for c in plan["captions"]:
         spans = []
@@ -119,8 +119,10 @@ def fx_html(plan, st, W, H, D):
                      + "".join(lines) + "</div>")
     for f in plan["fullscreens"]:
         ctx = f'<div class="fctx">{esc(f["ctx"])}</div>' if f.get("ctx") else ""
+        # taille auto : le chiffre doit tenir sur une ligne dans 960 px (Inter Tight 900 ≈ 0.56 em/car.)
+        fs = int(min(176, 960 / (0.56 * max(1, len(f["big"])))))
         items.append(f'    <div class="full" id="{f["id"]}" data-s="{f["start"]}" data-e="{f["end"]}">'
-                     f'<div class="fin"><div class="fbig">{esc(f["big"])}</div>{ctx}</div></div>')
+                     f'<div class="fin"><div class="fbig" style="font-size:{fs}px">{esc(f["big"])}</div>{ctx}</div></div>')
     for c in plan.get("cards", []):
         icon = ICONS.get(c.get("icon", "none"), "")
         svg = (f'<svg class="cic" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4" '
@@ -130,7 +132,7 @@ def fx_html(plan, st, W, H, D):
         items.append(f'    <div class="card {pos}" id="{c["id"]}" data-s="{c["start"]}" data-e="{c["end"]}">'
                      f'<div class="cin">{svg}<div class="clab">{esc(c.get("label", ""))}</div>'
                      f'<div class="ctit">{esc(c.get("title", ""))}</div>{pill}</div></div>')
-    yc = P["y_center"]
+    yc = plan.get("layout", {}).get("punch_y", P["y_center"])
     return f"""<template>
   <style>
 {font_faces()}
@@ -166,7 +168,7 @@ def fx_html(plan, st, W, H, D):
     }}
     .card {{ position: absolute; left: 60px; right: 60px; visibility: hidden; }}
     .card.top {{ top: 300px; }}
-    .card.bottom {{ bottom: {H - st['captions']['y_bottom']}px; }}
+    .card.bottom {{ bottom: {H - plan.get('layout', {}).get('cap_bottom', st['captions']['y_bottom'])}px; }}
     .cin {{
       background: #FFFFFF; border-radius: 40px; padding: 44px 52px 48px;
       box-shadow: 0 24px 60px rgba(0,0,0,.22), 0 2px 6px rgba(0,0,0,.08);

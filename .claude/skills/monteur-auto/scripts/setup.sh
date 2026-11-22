@@ -19,7 +19,7 @@ say "FFmpeg      : $(ffmpeg -version | head -1 | cut -d' ' -f1-3)"
 
 # 2. Whisper (faster-whisper) + 3. yt-dlp
 PIP="python3 -m pip"
-$PIP install -q -U yt-dlp faster-whisper numpy 2>/dev/null || $PIP install -q -U --break-system-packages yt-dlp faster-whisper numpy
+$PIP install -q -U yt-dlp faster-whisper numpy "opencv-python-headless<5" 2>/dev/null || $PIP install -q -U --break-system-packages yt-dlp faster-whisper numpy "opencv-python-headless<5"
 say "yt-dlp      : $(yt-dlp --version)"
 python3 -I -c "import faster_whisper; print('[setup] Whisper     : faster-whisper', faster_whisper.__version__)"
 

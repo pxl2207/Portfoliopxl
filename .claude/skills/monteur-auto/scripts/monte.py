@@ -97,6 +97,9 @@ def prep(a):
     log("Réalisation : sous-titres, punchs, cartes, caméra, sons")
     run(PY + [os.path.join(HERE, "plan_edit.py"), os.path.join(work, "cuts.json"), a.style,
               os.path.join(work, "plan.json")])
+    log("Placement : sous-titres et punchs jamais sur le visage")
+    run(PY + [os.path.join(HERE, "layout.py"), os.path.join(work, "cut.mp4"), os.path.join(work, "plan.json"),
+              a.style])
     print(work)
     return work
 
@@ -147,10 +150,19 @@ def render(a, work=None):
     dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of",
                                 "csv=p=0", out], capture_output=True, text=True).stdout.strip() or 0)
     n = 12
-    fps = n / max(dur, 1)
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", out, "-vf",
-                    f"fps={fps:.5f},scale=270:-1,drawtext=text='%{{pts\\:hms}}':x=6:y=6:fontsize=16:"
-                    f"fontcolor=yellow:box=1:boxcolor=black@0.5,tile=6x2", "-frames:v", "1", sheet])
+    tiles = []
+    for k in range(n):
+        t = dur * (k + 0.5) / n
+        fp = os.path.join(work, f".ctl_{k:02d}.jpg")
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", f"{t:.2f}", "-i", out, "-frames:v", "1", "-vf",
+                        f"scale=270:-1,drawtext=text='{int(t // 60)}\\:{t % 60:04.1f}':x=6:y=6:fontsize=16:"
+                        f"fontcolor=yellow:box=1:boxcolor=black@0.5", fp])
+        tiles.append(fp)
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", os.path.join(work, ".ctl_%02d.jpg"), "-vf", "tile=6x2",
+                    "-frames:v", "1", sheet])
+    for fp in tiles:
+        if os.path.exists(fp):
+            os.remove(fp)
     r = subprocess.run(["ffmpeg", "-v", "info", "-i", out, "-af", "ebur128=peak=true", "-f", "null", "-"],
                        capture_output=True, text=True).stderr
     summ = r[r.rfind("Summary:"):]
