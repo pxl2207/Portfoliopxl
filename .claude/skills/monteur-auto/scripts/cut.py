@@ -73,7 +73,8 @@ def main():
     open(script, "w").write(fc)
     cmd = ["ffmpeg", "-v", "error", "-y", "-i", a.video, "-filter_complex_script", script,
            "-map", "[vc]", "-map", "[ao]", "-c:v", "libx264", "-preset", "medium", "-crf", "17",
-           "-pix_fmt", "yuv420p", "-g", str(FPS // 2), "-keyint_min", str(FPS // 2), "-sc_threshold", "0",
+           "-pix_fmt", "yuv420p", "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709",
+           "-color_range", "tv", "-g", str(FPS // 2), "-keyint_min", str(FPS // 2), "-sc_threshold", "0",
            "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", a.out]
     subprocess.run(cmd, check=True)
     print(f"[cut] {n} segments -> {a.out} ({cuts['duration_out']:.1f}s)", file=sys.stderr)
