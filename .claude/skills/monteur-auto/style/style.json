@@ -1,0 +1,58 @@
+{
+  "_doc": "Paramètres chiffrés de la DA. Les règles en mots sont dans mes-regles.md. Modifiable à la main ou par /apprendre-mon-style.",
+  "canvas": { "w": 1080, "h": 1920, "fps": 30 },
+
+  "cuts": { "max_pause": 0.45, "keep_pause": 0.14, "pad_before": 0.07, "pad_after": 0.09 },
+
+  "grade": { "contrast": 1.06, "saturation": 1.07, "brightness": 0.0, "gamma": 1.0,
+             "warmth": 0.035, "sharpen": 0.35, "vignette": 0.35 },
+  "audio": { "lufs": -14, "music_volume": 0.10 },
+
+  "colors": {
+    "text": "#FFFFFF",
+    "dim": "rgba(255,255,255,0.38)",
+    "accent": "#E8763A",
+    "accent_alt": "#E2B860",
+    "ink": "#141414",
+    "paper": "#F3F1EC",
+    "pill": "#1F9D57",
+    "shadow": "rgba(0,0,0,0.55)"
+  },
+  "fonts": { "sans": "Inter Tight", "sans_weight": 800, "heavy_weight": 900,
+             "serif": "Instrument Serif", "mono": "JetBrains Mono" },
+
+  "captions": {
+    "size": 66,
+    "emph_scale": 1.32,
+    "max_words": 4,
+    "max_chars": 24,
+    "lowercase": true,
+    "y_bottom": 1210,
+    "max_width": 820,
+    "emphasis_ratio": 0.4,
+    "upcoming_dim": true
+  },
+
+  "punch": {
+    "first_hook": true,
+    "every_s": 11,
+    "min_gap_s": 7,
+    "size": 124,
+    "serif_size": 138,
+    "y_center": 1010,
+    "zoom": 1.12
+  },
+
+  "zoom": { "cut_alt": [1.0, 1.09], "drift": 0.035, "max": 1.16 },
+
+  "fullscreen": { "enabled": true, "max_per_30s": 1, "min_gap_s": 18, "dur": 1.5 },
+
+  "sfx": {
+    "volume": 0.42,
+    "punch": ["whoosh", "whoosh-short"],
+    "fullscreen": ["impact-bass-1"],
+    "card": ["pop"],
+    "emph": ["click-soft"],
+    "emph_every_s": 9
+  }
+}
