@@ -4,7 +4,7 @@
 set -euo pipefail
 export HF_HUB_DISABLE_XET=1
 HF_VERSION="${HYPERFRAMES_VERSION:-0.9.81}"
-WHISPER_MODEL="${MONTEUR_WHISPER:-small}"
+WHISPER_MODEL="${MONTEUR_WHISPER:-medium}"
 
 say() { printf '\033[1;36m[setup]\033[0m %s\n' "$*"; }
 

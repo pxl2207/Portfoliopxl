@@ -92,6 +92,8 @@ def main():
     ap.add_argument("--pad-before", type=float, default=0.07)
     ap.add_argument("--pad-after", type=float, default=0.09)
     ap.add_argument("--no-retakes", action="store_true")
+    ap.add_argument("--remove", default="",
+                    help="retraits forcés en secondes source, ex. '13.9-14.98,190.2-191.36'")
     a = ap.parse_args()
 
     data = json.load(open(a.words))
@@ -241,6 +243,34 @@ def main():
         seg_start = cut_b
     last = kept[-1]
     segs.append([seg_start, min(dur, true_end(last["end"], min(dur, last["end"] + 0.6)) + a.pad_after + 0.15)])
+    # retraits forcés : hésitations repérées par la passe rapide (fillers) + --remove manuel.
+    # Chaque bord est recalé sur le creux d'énergie le plus proche (±0,12 s) pour couper net.
+    forced = [(f["start"], f["end"], f.get("type", "hésitation"), f.get("text", ""))
+              for f in data.get("fillers", [])]
+    for part in filter(None, a.remove.split(",")):
+        x, y = part.split("-")
+        forced.append((float(x), float(y), "retrait manuel", ""))
+
+    def valley(t):
+        i0, i1 = fidx(t - 0.12), fidx(t + 0.12)
+        return (i0 + int(np.argmin(db[i0:i1 + 1]))) * FRAME if i1 > i0 else t
+
+    for rs, re_, kind, txt in forced:
+        rs, re_ = valley(rs), valley(re_)
+        if re_ - rs < 0.08:
+            continue
+        new = []
+        for s, e in segs:
+            if re_ <= s or rs >= e:
+                new.append([s, e])
+                continue
+            if rs - s > 0.05:
+                new.append([s, rs])
+            if e - re_ > 0.05:
+                new.append([re_, e])
+        if new != segs:
+            removed.append({"type": kind, "text": txt, "start": round(rs, 3), "end": round(re_, 3)})
+        segs = new
     segs = [[round(s, 3), round(e, 3)] for s, e in segs if e - s > 0.05]
 
     # remap des mots dans le temps monté

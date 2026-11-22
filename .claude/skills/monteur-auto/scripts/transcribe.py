@@ -30,8 +30,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("src")
     ap.add_argument("out")
-    ap.add_argument("--model", default=os.environ.get("MONTEUR_WHISPER", "small"))
+    ap.add_argument("--model", default=os.environ.get("MONTEUR_WHISPER", "medium"))
     ap.add_argument("--lang", default=None, help="fr, en... (auto si absent)")
+    ap.add_argument("--fillers-model", default="small",
+                    help="passe rapide pour repérer euh / faux départs ('' pour désactiver)")
     a = ap.parse_args()
 
     from faster_whisper import WhisperModel
@@ -56,9 +58,29 @@ def main():
                 continue
             words.append({"text": t, "start": round(float(w.start), 3),
                           "end": round(float(w.end), 3), "prob": round(float(w.probability), 3)})
-    json.dump({"lang": info.language, "duration": round(dur, 3), "words": words},
+    # Les gros modèles (medium, large) écrivent mieux mais « avalent » les euh et les faux départs
+    # dans les mots voisins. Une passe rapide « small » ne sert qu'à les repérer.
+    fillers = []
+    if a.fillers_model and a.fillers_model != a.model:
+        import re
+        fm = WhisperModel(a.fillers_model, device="cpu", compute_type="int8")
+        fs, _ = fm.transcribe(audio, language=info.language, word_timestamps=True, vad_filter=False,
+                              condition_on_previous_text=False,
+                              initial_prompt="Euh, alors, bah, hum... Voilà, donc euh, en fait.")
+        FILL = {"euh", "heu", "euhm", "hum", "hmm", "hm", "mmh", "mh", "uh", "um", "uhm", "erm", "ehm"}
+        for s in fs:
+            for w in (s.words or []):
+                t = w.word.strip()
+                n = re.sub(r"[^a-zà-ÿ]", "", t.lower())
+                if n in FILL:
+                    fillers.append({"type": "hésitation", "text": t, "start": round(float(w.start), 3),
+                                    "end": round(float(w.end), 3)})
+                elif re.search(r"(\.\.\.|…)$", t) and len(n) >= 2 and (w.end - w.start) > 0.45:
+                    fillers.append({"type": "mot coupé", "text": t, "start": round(float(w.start), 3),
+                                    "end": round(float(w.end), 3)})
+    json.dump({"lang": info.language, "duration": round(dur, 3), "words": words, "fillers": fillers},
               open(a.out, "w"), ensure_ascii=False, indent=0)
-    print(f"[transcribe] {len(words)} mots, langue={info.language}, durée={dur:.1f}s -> {a.out}",
+    print(f"[transcribe] {len(words)} mots, {len(fillers)} hésitations, langue={info.language}, durée={dur:.1f}s -> {a.out}",
           file=sys.stderr)
 
 

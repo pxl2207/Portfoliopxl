@@ -176,7 +176,7 @@ def main():
     ap.add_argument("src", nargs="?")
     ap.add_argument("--work")
     ap.add_argument("--style", default=os.path.join(SKILL, "style", "style.json"))
-    ap.add_argument("--model", default=os.environ.get("MONTEUR_WHISPER", "small"))
+    ap.add_argument("--model", default=os.environ.get("MONTEUR_WHISPER", "medium"))
     ap.add_argument("--lang", default=None)
     ap.add_argument("--music", default=None)
     ap.add_argument("--quality", default="looks")

@@ -43,23 +43,30 @@ def main():
             grade.append(f"unsharp=5:5:{g['sharpen']}:5:5:0")
         if g.get("vignette", 0):
             grade.append(f"vignette=angle={0.2 + 0.5 * g['vignette']:.3f}")
-    vpre = (f"[0:v]fps={FPS},scale={W}:{H}:force_original_aspect_ratio=increase,"
-            f"crop={W}:{H},setsar=1" + ("," + ",".join(grade) if grade else "") + f",split={n}")
-    apre = f"[0:a]aresample=48000,aformat=channel_layouts=stereo,asplit={n}"
-    parts = [vpre + "".join(f"[v{i}]" for i in range(n)), apre + "".join(f"[a{i}]" for i in range(n))]
-    cat = ""
-    for i, (s, e) in enumerate(segs):
-        d = e - s
-        parts.append(f"[v{i}]trim=start={s:.3f}:end={e:.3f},setpts=PTS-STARTPTS[vt{i}]")
-        parts.append(f"[a{i}]atrim=start={s:.3f}:end={e:.3f},asetpts=PTS-STARTPTS,"
-                     f"afade=t=in:st=0:d={fade},afade=t=out:st={max(0, d - fade):.3f}:d={fade}[at{i}]")
-        cat += f"[vt{i}][at{i}]"
+    # HDR (iPhone HLG / PQ) -> SDR Rec.709, sinon image grise et délavée
+    tone = []
+    pr = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
+                         "stream=color_transfer", "-of", "csv=p=0", a.video], capture_output=True, text=True)
+    trc = pr.stdout.strip()
+    if trc in ("arib-std-b67", "smpte2084"):
+        tone = [f"zscale=tin={trc}:min=bt2020nc:pin=bt2020:rin=tv:t=linear:npl=203", "format=gbrpf32le",
+                "zscale=p=bt709", "tonemap=hable:desat=2", "zscale=t=bt709:m=bt709:r=tv", "format=yuv420p",
+                "eq=saturation=0.82:gamma=1.08"]
+        print(f"[cut] source HDR ({trc}) -> conversion SDR", file=sys.stderr)
+
+    # Une seule passe : on sélectionne les segments gardés (pas de split = mémoire constante)
+    expr = "+".join(f"between(t,{s:.3f},{e:.3f})" for s, e in segs)
+    parts = [
+        "[0:v]" + ",".join([f"fps={FPS}", f"select='{expr}'", f"setpts=N/({FPS}*TB)"] + tone +
+                           [f"scale={W}:{H}:force_original_aspect_ratio=increase", f"crop={W}:{H}", "setsar=1"]
+                           + grade) + "[vc]",
+        f"[0:a]aresample=48000,aformat=channel_layouts=stereo,aselect='{expr}',asetpts=N/SR/TB[ac]",
+    ]
     ac = st.get("audio", {})
     lufs = ac.get("lufs", -14)
     achain = (f"highpass=f=75,afftdn=nr=8:nf=-45,"
               f"acompressor=threshold=-20dB:ratio=3:attack=8:release=120:makeup=2,"
               f"loudnorm=I={lufs}:TP=-1.5:LRA=9")
-    parts.append(f"{cat}concat=n={n}:v=1:a=1[vc][ac]")
     parts.append(f"[ac]{achain},aresample=48000[ao]")
     fc = ";\n".join(parts)
     script = a.out + ".filter.txt"

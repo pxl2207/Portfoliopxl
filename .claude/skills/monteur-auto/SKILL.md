@@ -33,8 +33,18 @@ Réseau : Whisper télécharge son modèle depuis huggingface.co au premier lanc
 python3 -I SKILL_DIR/scripts/monte.py prep <video.mp4|lien> [--lang fr] [--model small]
 ```
 Crée `<video>_montage/` avec `words.json`, `cuts.json`, `cut.mp4`, `plan.json`.
-Langue : auto-détectée ; passe `--lang fr` si la vidéo est en français. `--model medium` si le son est
-mauvais ou s'il y a de la musique dessous.
+Langue : auto-détectée ; passe `--lang fr` si la vidéo est en français.
+- Modèle par défaut **medium** (bien meilleur sur les noms propres, sigles, écoles, marques) + une passe
+  rapide **small** qui ne sert qu'à repérer les « euh » et faux départs que medium « avale » dans les
+  mots voisins (ils sont dans `words.json` → `fillers`, et coupés automatiquement).
+- Vidéo iPhone/Android **HDR** (HLG/PQ) : convertie automatiquement en SDR par `cut.py` (sinon l'image
+  sort grise et délavée).
+- Compte ~2 min de calcul par minute de vidéo pour la transcription et ~2 min par minute pour la coupe.
+
+**Vidéo dans Dropbox** (trop lourde pour le chat) : `search` (catégorie vidéo) → `download_link` →
+`curl -o` dans un dossier de travail. Le lien est à usage unique (ne pas le tester avant) et chaque lien
+pointe vers un sous-domaine aléatoire `uc….dl.dropboxusercontent.com` : si le réseau est limité, il faut
+l'ouvrir le temps du téléchargement puis le refermer.
 
 ### 2. Relire et affiner (c'est là que tu es le monteur)
 Lis `cuts.json` puis `plan.json` en entier, avec la transcription. Corrige directement les JSON :
@@ -42,15 +52,22 @@ Lis `cuts.json` puis `plan.json` en entier, avec la transcription. Corrige direc
 **Les coupes (`cuts.json` → `removed`)** — vérifie chaque retrait :
 - une « prise ratée » qui n'en est pas une (deux phrases différentes qui commencent pareil) → relance
   `plan_cuts.py` avec `--no-retakes`, ou ajuste `segments` à la main ;
-- un « euh » oublié, un faux départ évident non détecté → retire-le dans `segments` (en secondes de la
-  source) ;
+- un « euh » oublié, un faux départ, une phrase reprise (« me correspond plutôt, et correspond plutôt
+  vraiment ») → relance `plan_cuts.py ... --remove "13.9-14.1,190.16-191.33"` (secondes de la source ;
+  chaque bord est recalé sur le creux de son le plus proche). Pour un timing précis, re-transcris
+  juste l'extrait de 3 s (Whisper est bien plus précis sur un court extrait) et regarde l'énergie ;
 - si tu modifies `cuts.json`, relance `cut.py` puis `plan_edit.py` (commandes dans `monte.py`), puis
   reviens au plan.
 - **Pas trop de coupes** : jamais de coupe au milieu d'une phrase fluide, jamais pour gagner 0,2 s.
 
 **Le plan (`plan.json`)** :
 - `captions[].words[].text` : corrige l'orthographe et les noms propres mal entendus par Whisper
-  (marques, prénoms, sigles). Ne change jamais les temps.
+  (marques, prénoms, sigles, écoles : EDHEC, NEOMA, SKEMA, HGGSP…). Ne change jamais les temps. Un mot
+  vidé (`""`) disparaît. Un nom de personne que tu ne peux pas vérifier : garde la meilleure
+  transcription et signale-le dans le compte rendu.
+- Si tu supprimes un punch, remets ses mots en sous-titres (sinon ils disparaissent de l'écran) ; si
+  tu en ajoutes un, retire ces mots des sous-titres. Recalcule ensuite les `push` de `camera` et les
+  sons (`sfx`) pour qu'ils suivent les punchs et pleins écrans.
 - `emph` : ~1 mot clé par groupe 4 fois sur 10 — le cœur de la phrase (chiffre, nom, mot fort).
   Jamais sur un mot outil (« le », « de », « c'est »).
 - `punches` : le hook (1re phrase) doit être percutant ; les autres punchs tombent sur les **idées
