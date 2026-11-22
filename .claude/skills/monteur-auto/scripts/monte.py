@@ -121,6 +121,9 @@ def render(a, work=None):
     log("HyperFrames : vérification (lint + runtime + mise en page)")
     rep = os.path.join(work, "check.json")
     with open(rep, "w") as fh:
+        # vidéo HEVC / HDR : HyperFrames doit d'abord en faire une copie lisible par le navigateur (sans limite)
+        subprocess.run(["hyperframes", "check", "--prepare-media"], cwd=proj,
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         subprocess.run(["hyperframes", "check", "--json"], cwd=proj, stdout=fh, stderr=subprocess.DEVNULL)
     try:
         chk = json.load(open(rep))
