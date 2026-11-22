@@ -47,7 +47,7 @@ def main():
     tone = []
     pr = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
                          "stream=color_transfer", "-of", "csv=p=0", a.video], capture_output=True, text=True)
-    trc = pr.stdout.strip()
+    trc = pr.stdout.strip().split(",")[0].strip()
     hdr = trc in ("arib-std-b67", "smpte2084")
     keep_hdr = hdr and st.get("hdr", "keep") == "keep"
     if hdr and not keep_hdr:
