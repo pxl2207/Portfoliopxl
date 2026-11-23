@@ -181,6 +181,19 @@ def render(a, work=None):
         "plein_ecran": len(plan["fullscreens"]), "cartes": len(plan.get("cards", [])),
         "sons": len(plan["sfx"]), "loudness": lufs, "true_peak": peak, "rendu_s": round(dt),
     }
+    # Version lisible partout (H.264 SDR) : beaucoup de lecteurs (Android, Chrome, aperçus) ne lisent pas le HEVC HDR
+    trc = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=color_transfer",
+                          "-of", "csv=p=0", out], capture_output=True, text=True).stdout.strip().split(",")[0].strip()
+    if trc in ("arib-std-b67", "smpte2084"):
+        compat = os.path.join(work, f"{meta['name']}_monte_compatible.mp4")
+        log("Export H.264 lisible partout (conversion HDR -> SDR la plus neutre possible)")
+        run(["ffmpeg", "-v", "error", "-y", "-i", out, "-vf",
+             "zscale=t=linear:npl=203,format=gbrpf32le,zscale=p=bt709,tonemap=mobius:desat=0,"
+             "zscale=t=bt709:m=bt709:r=tv,format=yuv420p",
+             "-c:v", "libx264", "-preset", "medium", "-crf", "23", "-maxrate", "3M", "-bufsize", "6M",
+             "-profile:v", "high", "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709",
+             "-color_range", "tv", "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart", compat])
+        rapport["video_compatible"] = compat
     json.dump(rapport, open(os.path.join(work, "rapport.json"), "w"), indent=1, ensure_ascii=False)
     print(json.dumps(rapport, indent=1, ensure_ascii=False))
 

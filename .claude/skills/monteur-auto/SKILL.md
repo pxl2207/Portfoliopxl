@@ -102,6 +102,9 @@ rend le MP4 et écrit `rapport.json` + `controle.jpg` (12 images).
 - Un problème → corrige `plan.json` (ou `style.json`) et relance l'étape 3. Deux passes max.
 
 ### 5. Livrer
+Source HDR : livre **les deux** fichiers — `<nom>_monte_compatible.mp4` (H.264, lisible partout :
+Android, navigateur, aperçus, envoi) en premier, et `<nom>_monte.mp4` (HEVC HDR, couleurs d'origine
+exactes, pour iPhone / publication). Le HEVC HDR seul est souvent illisible côté utilisateur.
 Donne le chemin du MP4 final et un compte rendu court : durée brute → montée, nombre de coupes et
 ce qui a été retiré (blancs, hésitations, prises ratées), nombre de punchs / mots clés / sons,
 et les choix faits à ta place. Précise que le son a été mesuré, pas écouté.
