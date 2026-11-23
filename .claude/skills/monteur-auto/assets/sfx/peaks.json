@@ -1,0 +1,97 @@
+{
+ "chime": {
+  "peak": 0.426,
+  "dur": 2.5,
+  "peak_db": -10.5
+ },
+ "click-soft": {
+  "peak": 0.064,
+  "dur": 0.366,
+  "peak_db": -3.9
+ },
+ "click": {
+  "peak": 0.064,
+  "dur": 0.366,
+  "peak_db": -3.9
+ },
+ "error": {
+  "peak": 0.746,
+  "dur": 1.62,
+  "peak_db": -18.3
+ },
+ "glitch-1": {
+  "peak": 0.813,
+  "dur": 2.638,
+  "peak_db": 3.7
+ },
+ "glitch-2": {
+  "peak": 1.18,
+  "dur": 3.504,
+  "peak_db": 4.6
+ },
+ "glitch-3": {
+  "peak": 1.807,
+  "dur": 3.096,
+  "peak_db": -9.2
+ },
+ "impact-bass-1": {
+  "peak": 0.08,
+  "dur": 2.116,
+  "peak_db": 2.6
+ },
+ "impact-bass-2": {
+  "peak": 2.037,
+  "dur": 2.592,
+  "peak_db": 3.0
+ },
+ "key-press": {
+  "peak": 0.083,
+  "dur": 0.4,
+  "peak_db": -9.6
+ },
+ "notification": {
+  "peak": 0.237,
+  "dur": 2.455,
+  "peak_db": -3.7
+ },
+ "ping": {
+  "peak": 0.333,
+  "dur": 1.32,
+  "peak_db": -4.6
+ },
+ "pop": {
+  "peak": 0.127,
+  "dur": 0.72,
+  "peak_db": -0.2
+ },
+ "riser": {
+  "peak": 3.039,
+  "dur": 10.032,
+  "peak_db": 2.8
+ },
+ "sparkle": {
+  "peak": 0.089,
+  "dur": 1.802,
+  "peak_db": 2.2
+ },
+ "typing": {
+  "peak": 0.464,
+  "dur": 1.5,
+  "peak_db": -6.4
+ },
+ "whoosh-cinematic": {
+  "peak": 2.546,
+  "dur": 5.544,
+  "peak_db": 2.7
+ },
+ "whoosh-short": {
+  "peak": 0.167,
+  "dur": 0.575,
+  "peak_db": 0.7
+ },
+ "whoosh": {
+  "peak": 0.167,
+  "dur": 0.575,
+  "peak_db": 0.7
+ }
+}
